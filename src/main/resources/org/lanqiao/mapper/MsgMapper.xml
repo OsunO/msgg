@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.lanqiao.dao.MsgDao">
+  <resultMap id="MsgResult" type="org.lanqiao.entity.Msg">
+    <id column="msgId" jdbcType="INTEGER" property="msgId" />
+    <result column="userSay" jdbcType="VARCHAR" property="userSay" />
+    <result column="time" jdbcType="DATE" property="time" />
+    <result column="userName" jdbcType="VARCHAR" property="userName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    msgId, userSay, time, userName
+  </sql>
+<select id="getAllMsg"  resultMap="MsgResult">
+    select * from msg
+  </select>
+  <select id="getMaxPage"  resultType="Integer">
+    select count(*) from msg
+  </select>
+  <select id="getMsgByPage" parameterType="java.lang.Integer" resultMap="MsgResult">
+    select * from msg order by msgId desc limit  #{0},#{1}
+  </select>
+  <select id="getMaxPageByMsg"  parameterType="hashMap" resultType="Integer">
+    select count(*) from msg
+    <trim prefix="where" prefixOverrides="and|or">
+      <if test ="title != null">
+         userSay like #{title}
+      </if>
+      <if test ="starTime != null">
+          <![CDATA[and time >= #{starTime}]]>
+      </if>
+      <if test ="endTime != null">
+         <![CDATA[and time <= #{endTime}]]>
+      </if>
+    </trim>
+  </select>
+  <select id="searchMsg" parameterType="hashMap" resultType="org.lanqiao.entity.Msg">
+    select * from msg
+    <trim prefix="WHERE" prefixOverrides="AND | OR">
+      <if test ="title != null">
+         userSay like #{title}
+      </if>
+      <if test ="starTime != null">
+         <![CDATA[and time >= #{starTime}]]>
+      </if>
+      <if test ="endTime != null">
+         <![CDATA[and time <= #{endTime}]]>
+      </if>
+    </trim>
+     limit #{beginPage},#{pageSize}
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="MsgResult">
+    select 
+    <include refid="Base_Column_List" />
+    from msg
+    where msgId = #{msgId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from msg
+    where msgId = #{msgId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="msgId" parameterType="org.lanqiao.entity.Msg">
+    insert into msg ( userSay, time, 
+      userName)
+    values ( #{userSay,jdbcType=VARCHAR}, #{time,jdbcType=DATE}, 
+      #{userName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="org.lanqiao.entity.Msg">
+    insert into msg
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="msgId != null">
+        msgId,
+      </if>
+      <if test="userSay != null">
+        userSay,
+      </if>
+      <if test="time != null">
+        time,
+      </if>
+      <if test="userName != null">
+        userName,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="msgId != null">
+        #{msgId,jdbcType=INTEGER},
+      </if>
+      <if test="userSay != null">
+        #{userSay,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=DATE},
+      </if>
+      <if test="userName != null">
+        #{userName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.lanqiao.entity.Msg">
+    update msg
+    <set>
+      <if test="userSay != null">
+        userSay = #{userSay,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        time = #{time,jdbcType=DATE},
+      </if>
+      <if test="userName != null">
+        userName = #{userName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where msgId = #{msgId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.lanqiao.entity.Msg">
+    update msg
+    set userSay = #{userSay,jdbcType=VARCHAR},
+      time = #{time,jdbcType=DATE},
+      userName = #{userName,jdbcType=VARCHAR}
+    where msgId = #{msgId,jdbcType=INTEGER}
+  </update>
+</mapper>
